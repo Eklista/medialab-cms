@@ -101,7 +101,7 @@ class ApiClient {
 }
 
 const apiClient = new ApiClient({
-  baseURL: env.API_BASE_URL,
+  baseURL: env.API_BASE_URL || 'https://api-test.thedojolab.com',
   token: localStorage.getItem(env.AUTH_TOKEN_KEY) || undefined,
 });
 
