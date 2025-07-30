@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,7 +33,7 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, role, isAuthenticated, getDebugInfo } = useAuth();
   const { toast } = useToast();
 
   const {
@@ -49,12 +49,39 @@ export default function Login() {
     },
   });
 
+  // Efecto para redirigir cuando cambie el estado de autenticación
+  useEffect(() => {
+    if (isAuthenticated && role) {
+      console.log('Auth state changed, redirecting...', { role, isAuthenticated });
+      
+      switch (role) {
+        case 'admin':
+          navigate('/admin/dashboard', { replace: true });
+          break;
+        case 'collaborator':
+          navigate('/collaborator/dashboard', { replace: true });
+          break;
+        case 'client':
+          navigate('/client/portal', { replace: true });
+          break;
+        default:
+          navigate('/dashboard', { replace: true });
+          break;
+      }
+    }
+  }, [isAuthenticated, role, navigate]);
+
   const onSubmit = async (data: LoginFormData) => {
     try {
       setIsLoading(true);
       setError(null);
 
+      console.log('Attempting login with:', data.email);
+
       const result = await login(data.email, data.password);
+
+      console.log('Login result:', result);
+      console.log('Debug info after login:', getDebugInfo());
 
       if (result.success) {
         toast({
@@ -62,11 +89,12 @@ export default function Login() {
           title: '¡Bienvenido!',
           description: 'Has iniciado sesión correctamente.',
         });
-        navigate('/dashboard');
+        // El useEffect se encargará de la redirección
       } else {
         setError(result.error || 'Error al iniciar sesión');
       }
     } catch (err) {
+      console.error('Login error:', err);
       setError('Error de conexión. Intenta nuevamente.');
     } finally {
       setIsLoading(false);
@@ -144,6 +172,15 @@ export default function Login() {
         >
           {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
         </Button>
+
+        {/* Debug info en desarrollo */}
+        {import.meta.env.DEV && (
+          <div className="mt-4 p-3 bg-zinc-800 rounded text-xs">
+            <p>Debug - Role: {role || 'null'}</p>
+            <p>Debug - Authenticated: {isAuthenticated ? 'true' : 'false'}</p>
+            <p>Debug - Loading: {isLoading ? 'true' : 'false'}</p>
+          </div>
+        )}
 
         <div className="text-center pt-4 border-t border-border">
           <p className="text-text-secondary text-sm">

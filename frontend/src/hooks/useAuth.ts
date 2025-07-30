@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '../stores/authStore';
-import { apiClient } from '../services/api';
 
 export function useAuth() {
+  const store = useAuthStore();
   const {
     user,
     token,
@@ -14,7 +14,7 @@ export function useAuth() {
     updateToken,
     setUser,
     initialize,
-  } = useAuthStore();
+  } = store;
 
   useEffect(() => {
     initialize();
@@ -22,22 +22,18 @@ export function useAuth() {
 
   const loginWithCredentials = async (email: string, password: string) => {
     try {
-      const response = await apiClient.post('/auth/login', {
-        email,
-        password,
-      });
-
-      if ((response as any).data) {
-        // Llamar al store login que maneja toda la lógica
-        await loginStore(email, password);
-        
-        return { success: true };
-      } else {
-        return {
-          success: false,
-          error: 'Credenciales inválidas',
-        };
-      }
+      // Llamar al store login que maneja toda la lógica
+      await loginStore(email, password);
+      
+      // Obtener el estado actualizado inmediatamente
+      const currentState = useAuthStore.getState();
+      console.log('State after login:', currentState);
+      
+      return { 
+        success: true, 
+        role: currentState.role,
+        isAuthenticated: currentState.isAuthenticated 
+      };
     } catch (error: any) {
       console.error('Login error:', error);
       
@@ -70,6 +66,16 @@ export function useAuth() {
     return permissions.includes(permission);
   };
 
+  // Debug helper
+  const getDebugInfo = () => ({
+    user,
+    token: token ? '***' + token.slice(-10) : null,
+    role,
+    permissions,
+    isAuthenticated,
+    storeState: store
+  });
+
   return {
     // Estado
     user,
@@ -91,5 +97,8 @@ export function useAuth() {
     logout,
     updateToken,
     setUser,
+    
+    // Debug
+    getDebugInfo,
   };
 }

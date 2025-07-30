@@ -97,13 +97,13 @@ function App() {
 
           {/* ADMIN MODULE */}
           <Route 
-            path="/admin/*" 
+            path="/admin/dashboard" 
             element={
               <ProtectedRoute>
                 <AdminCheck>
                   <div className="min-h-screen bg-background">
                     <div className="p-8">
-                      <h1 className="text-white text-2xl mb-4">🔧 Admin Dashboard</h1>
+                      <h1 className="text-white text-2xl mb-4">Admin Dashboard</h1>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="bg-surface p-6 rounded-lg border border-border">
                           <h2 className="text-lg font-semibold text-white mb-2">Gestión de Usuarios</h2>
@@ -127,13 +127,13 @@ function App() {
 
           {/* COLLABORATOR MODULE */}
           <Route 
-            path="/collaborator/*" 
+            path="/collaborator/dashboard" 
             element={
               <ProtectedRoute>
                 <CollaboratorCheck>
                   <div className="min-h-screen bg-background">
                     <div className="p-8">
-                      <h1 className="text-white text-2xl mb-4">🎬 Collaborator Dashboard</h1>
+                      <h1 className="text-white text-2xl mb-4">Collaborator Dashboard</h1>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="bg-surface p-6 rounded-lg border border-border">
                           <h2 className="text-lg font-semibold text-white mb-2">Mis Tareas</h2>
@@ -153,13 +153,13 @@ function App() {
 
           {/* CLIENT MODULE */}
           <Route 
-            path="/client/*" 
+            path="/client/portal" 
             element={
               <ProtectedRoute>
                 <ClientCheck>
                   <div className="min-h-screen bg-background">
                     <div className="p-8">
-                      <h1 className="text-white text-2xl mb-4">📝 Client Portal</h1>
+                      <h1 className="text-white text-2xl mb-4">Client Portal</h1>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="bg-surface p-6 rounded-lg border border-border">
                           <h2 className="text-lg font-semibold text-white mb-2">Nueva Solicitud</h2>
