@@ -30,8 +30,17 @@ export default function Welcome() {
           <p className="text-xl text-text-secondary font-sans">
             Sistema de gestión para el departamento de medios audiovisuales
           </p>
-          <div className="mt-6 inline-block bg-surface px-4 py-2 rounded-lg border border-border">
-            <span className="text-sm text-text-secondary">Universidad Galileo</span>
+          <div className="mt-6 flex gap-4 justify-center">
+            <div className="bg-surface px-4 py-2 rounded-lg border border-border">
+              <span className="text-sm text-text-secondary">Universidad Galileo</span>
+            </div>
+            <a 
+              href="/showcase" 
+              className="bg-white hover:bg-gray-100 text-zinc-900 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200"
+              style={{ fontFamily: 'Poppins, system-ui, sans-serif' }}
+            >
+              Ver Componentes UI
+            </a>
           </div>
         </div>
 
