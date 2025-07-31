@@ -34,7 +34,7 @@ function mapDirectusRole(directusRole: string): 'admin' | 'collaborator' | 'clie
 
 export const useAuthStore = create<AuthStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       token: null,
       role: null,

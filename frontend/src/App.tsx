@@ -5,6 +5,7 @@ import { useAuth } from './hooks/useAuth';
 // Modules
 import CMSRoutes from './modules/cms/routes';
 import AuthRoutes from './modules/auth/routes';
+import ClientRoutes from './modules/clients/routes';
 
 // Role-based route redirection
 function DashboardRedirect() {
@@ -153,28 +154,11 @@ function App() {
 
           {/* CLIENT MODULE */}
           <Route 
-            path="/client/portal" 
+            path="/client/*" 
             element={
               <ProtectedRoute>
                 <ClientCheck>
-                  <div className="min-h-screen bg-background">
-                    <div className="p-8">
-                      <h1 className="text-white text-2xl mb-4">Client Portal</h1>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-surface p-6 rounded-lg border border-border">
-                          <h2 className="text-lg font-semibold text-white mb-2">Nueva Solicitud</h2>
-                          <p className="text-text-secondary text-sm">Crear solicitud de servicio</p>
-                          <button className="mt-4 bg-white text-zinc-900 px-4 py-2 rounded-lg font-medium">
-                            Crear Solicitud
-                          </button>
-                        </div>
-                        <div className="bg-surface p-6 rounded-lg border border-border">
-                          <h2 className="text-lg font-semibold text-white mb-2">Mis Solicitudes</h2>
-                          <p className="text-text-secondary text-sm">Ver estado de mis solicitudes</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <ClientRoutes />
                 </ClientCheck>
               </ProtectedRoute>
             } 

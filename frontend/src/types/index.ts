@@ -118,3 +118,52 @@ export interface CreateTaskForm {
   assignee: string;
   due_date: string;
 }
+
+// Extender los tipos base para incluir información de proyectos del cliente
+export interface ClientProject extends Project {
+  // Información adicional para la vista del cliente
+  client_id?: string;
+  progress?: number;
+  collaborators?: string[];
+  deliverables?: ProjectDeliverable[];
+  request_id?: number; // ID de la solicitud que originó este proyecto
+}
+
+export interface ProjectDeliverable {
+  id: number;
+  name: string;
+  type: 'audio' | 'video' | 'image' | 'document' | 'other';
+  url?: string;
+  completed: boolean;
+  file_size?: number;
+  mime_type?: string;
+  download_count?: number;
+  uploaded_at?: string;
+}
+
+export interface ProjectProgress {
+  total_tasks: number;
+  completed_tasks: number;
+  percentage: number;
+  last_updated: string;
+}
+
+export interface ProjectStats {
+  total: number;
+  published: number;
+  draft: number;
+  archived: number;
+  in_progress: number;
+}
+
+// Filtros para proyectos
+export interface ProjectFilters {
+  search?: string;
+  status?: 'published' | 'draft' | 'archived' | '';
+  project_type?: string;
+  faculty?: string;
+  date_range?: {
+    start: string;
+    end: string;
+  };
+}
