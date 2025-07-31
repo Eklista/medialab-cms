@@ -58,6 +58,17 @@ export const projectsApi = {
     apiClient.get<ApiListResponse<Project>>('/items/projects', {
       fields: '*,faculty.*,project_type.*',
       ...params
+    }),
+
+  // Nuevo: Obtener proyectos con tareas y entregables
+  getWithFullRelations: (params?: Record<string, any>) =>
+    apiClient.get<ApiListResponse<Project>>('/items/projects', {
+      fields: [
+        '*',
+        'faculty.id,faculty.name,faculty.short_name',
+        'project_type.id,project_type.name,project_type.description'
+      ].join(','),
+      ...params
     })
 };
 
@@ -80,7 +91,7 @@ export const tasksApi = {
   getByProject: (projectId: number) =>
     apiClient.get<ApiListResponse<Task>>('/items/tasks', {
       filter: { project: { _eq: projectId } },
-      fields: '*,assignee.*'
+      fields: '*,assignee.first_name,assignee.last_name,assignee.email'
     }),
 
   getByAssignee: (assigneeId: string) =>
@@ -130,4 +141,39 @@ export const catalogsApi = {
   
   getDeliverableTypes: () =>
     apiClient.get<ApiListResponse<DeliverableType>>('/items/deliverable_types')
+};
+
+// Nuevos endpoints específicos para el cliente
+export const clientApi = {
+  // Obtener proyectos del cliente (cuando implementes la relación)
+  getMyProjects: () =>
+    apiClient.get<ApiListResponse<Project>>('/items/projects', {
+      fields: [
+        '*',
+        'faculty.id,faculty.name,faculty.short_name',
+        'project_type.id,project_type.name'
+      ].join(','),
+      // TODO: Agregar filtro por cliente cuando definas la relación
+      // filter: { client_id: { _eq: '$CURRENT_USER' } }
+    }),
+
+  // Obtener tareas de un proyecto específico
+  getProjectTasks: (projectId: number) =>
+    apiClient.get<ApiListResponse<Task>>('/items/tasks', {
+      filter: { project: { _eq: projectId } },
+      fields: [
+        '*',
+        'assignee.id,assignee.first_name,assignee.last_name'
+      ].join(',')
+    }),
+
+  // Obtener entregables de una tarea
+  getTaskDeliverables: (taskId: number) =>
+    apiClient.get<ApiListResponse<TaskDeliverable>>('/items/task_deliverables', {
+      filter: { task: { _eq: taskId } },
+      fields: [
+        '*',
+        'deliverable_type.id,deliverable_type.name,deliverable_type.icon,deliverable_type.color'
+      ].join(',')
+    })
 };

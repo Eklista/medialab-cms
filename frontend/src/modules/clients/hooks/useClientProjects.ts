@@ -1,14 +1,66 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../hooks';
 import { projectsApi } from '../../../services/api';
-import type { Project } from '../../../types';
+
+interface ProjectWithRelations {
+  id: number;
+  status: 'published' | 'draft' | 'archived';
+  title: string;
+  description?: string;
+  start_date: string;
+  end_date: string;
+  faculty?: {
+    id: number;
+    name: string;
+    short_name: string;
+  };
+  project_type?: {
+    id: number;
+    name: string;
+    description?: string;
+  };
+  tasks?: Array<{
+    id: number;
+    title: string;
+    status: string;
+    category: string;
+    assignee?: {
+      id: string;
+      first_name: string;
+      last_name: string;
+    };
+    deliverables?: Array<{
+      id: number;
+      label: string;
+      url: string;
+      deliverable_type?: {
+        name: string;
+        color: string;
+        icon: string;
+      };
+    }>;
+  }>;
+  // Campos calculados
+  progress?: number;
+  collaborators?: string[];
+  deliverables?: Array<{
+    id: number;
+    label: string;
+    url: string;
+    deliverable_type?: {
+      name: string;
+      color: string;
+      icon: string;
+    };
+  }>;
+}
 
 interface UseClientProjectsReturn {
-  projects: Project[];
+  projects: ProjectWithRelations[];
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
-  getProjectsByStatus: (status: string) => Project[];
+  getProjectsByStatus: (status: string) => ProjectWithRelations[];
   getProjectStats: () => {
     total: number;
     published: number;
@@ -19,7 +71,7 @@ interface UseClientProjectsReturn {
 
 export function useClientProjects(): UseClientProjectsReturn {
   const { user } = useAuth();
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<ProjectWithRelations[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,31 +85,39 @@ export function useClientProjects(): UseClientProjectsReturn {
       setIsLoading(true);
       setError(null);
 
-      // Filtrar proyectos por el ID del cliente
-      // En Directus, esto sería algo como filtrar por client_id o created_by
+      // Obtener proyectos con relaciones según tu estructura
       const response = await projectsApi.getWithRelations({
-        filter: {
-          // Esto depende de cómo esté estructurada tu relación en Directus
-          // Opción 1: Si tienes un campo client_id directamente
-          client_id: { _eq: user.id },
-          
-          // Opción 2: Si está relacionado a través de las requests
-          // request: { user_created: { _eq: user.id } }
-          
-          // Opción 3: Si tienes una tabla de relación many-to-many
-          // project_clients: { client: { _eq: user.id } }
-        },
         fields: [
           '*',
-          'faculty.name',
+          'faculty.id',
+          'faculty.name', 
+          'faculty.short_name',
+          'project_type.id',
           'project_type.name',
-          'tasks.assignee.*',
-          'tasks.deliverables.*'
+          'project_type.description'
         ].join(','),
         sort: '-date_created'
       });
 
-      setProjects(response.data);
+      console.log('Projects from API:', response.data);
+      
+      // Transformar los datos para que coincidan con nuestra interface
+      const transformedProjects: ProjectWithRelations[] = response.data.map((project: any) => ({
+        id: project.id,
+        status: project.status,
+        title: project.title,
+        description: project.description,
+        start_date: project.start_date,
+        end_date: project.end_date,
+        faculty: project.faculty,
+        project_type: project.project_type,
+        tasks: [],
+        progress: project.status === 'archived' ? 100 : project.status === 'published' ? 50 : 0,
+        collaborators: [],
+        deliverables: []
+      }));
+
+      setProjects(transformedProjects);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al cargar proyectos';
       setError(errorMessage);
